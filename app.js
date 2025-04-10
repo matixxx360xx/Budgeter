@@ -1,5 +1,6 @@
 const prompt = require('prompt-sync')();
 const fs = require('fs');
+const  {jsPDF}  = require('jspdf');
 
 class Budgeter{
     constructor() {
@@ -86,6 +87,18 @@ class Budgeter{
             console.error(' Błąd odczytu pliku:', err);
         }
     }
+    generatePDF() {
+        const doc = new jsPDF();
+
+        doc.text(`Kasa: ${this.income} PLN`, 10, 10);
+        doc.text(`Wydatki:`, 10, 20);
+        this.expenses.forEach((expense, index) => {
+            doc.text(`${index + 1}. ${expense.category}: ${expense.amount} PLN`, 10, 30 + index * 10);
+        });
+
+        doc.save('data.pdf');
+        console.log('PDF został zapisany jako "data.pdf"');
+    }
 }
 
 function main(){
@@ -108,6 +121,7 @@ while(true){
     console.log("3. Dodaj wydatki na transport");
     console.log("4. Dodaj wydatki na rozrywkę");
     console.log("5. Wyjście z programu");
+    console.log("6. Generuj PDF z podsumowaniem");
 
 const option =  parseInt(prompt('Co chcesz zrobic : '));
 
@@ -125,12 +139,16 @@ switch(option){
         budgeter.entertainment();
         break;
     case 5:
+        budgeter.generatePDF();
+        break;
+    case 6:
         console.log("Dziękujemy za skorzystanie z budżetera. Do zobaczenia!");
         process.exit(0); 
     default:
         console.log("Niepoprawny wybór, spróbuj ponownie.");
     }
 }
+   
 }
 
 main();
